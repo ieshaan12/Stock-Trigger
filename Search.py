@@ -1,0 +1,60 @@
+import requests
+import lxml.html as lh
+import pandas as pd
+
+
+class Search:
+    searchstring = "https://finance.yahoo.com/lookup?s={}&.TSRC=FIN-SRCH"
+
+    def __init__(self, name=""):
+        self._name = name
+        self.results = None
+        self.resultsDataFrame = None
+
+    def topResults(self) -> None:
+        page = requests.get(Search.searchstring.format(self._name))
+        doc = lh.fromstring(page.content)
+        # Getting results
+        tableRowElements = doc.xpath('//tr')
+        col = []
+        i = 0
+
+        for t in tableRowElements[0]:
+            i += 1
+            name = t.text_content()
+            # print(i, ": ", name)
+            col.append((name, []))
+
+        for j in range(1, len(tableRowElements)):
+            # T is our j'th row
+            T = tableRowElements[j]
+
+            # i is the index of our column
+            i = 0
+
+            # Iterate through each element of the row
+            for t in T.iterchildren():
+                data = t.text_content()
+                # Check if row is empty
+                if i > 0:
+                    # Convert any numerical value to integers
+                    try:
+                        data = float(data)
+                    except Exception as _:
+                        pass
+                # Append the data to the empty list of the i'th column
+                col[i][1].append(data)
+                # Increment i for the next column
+                i += 1
+
+        stockDict = {title: column for (title, column) in col}
+        df = pd.DataFrame(stockDict)
+        self.resultsDataFrame = df
+        self.results = list(df['Symbol'])
+
+    def getTopSearch(self) -> str:
+        if self.results:
+            return self.results[0]
+        else:
+            print("Run topResults() first, otherwise null string will be returned")
+        return ""
