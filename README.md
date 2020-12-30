@@ -22,6 +22,9 @@ I'll be introducing you to setting this up via Task Scheduler. This is so far ex
 - Then it'll ask you to set a program/script, now go to your directory for Python (this will be in `C:/`) and select <strong>`pythonw.exe`</strong> not `python.exe` for it to run in background. 
 - In the `Add arguments` option give the whole path of `MainFile.py` and for `Start In` give the directory of `this project`.
 
+## Using MainSearchFile.py
+
+Here, you can get back the results for whichever stock you want to search, just edit the name of the company which you want to search. It will return a list of 25 top-most searches in the `object.results`. If you want to get a more comprehensive idea, you can check out `object.resultsDataFrame` where it returns a Pandas DataFrame about these 25 results. You can get the top most search string which you can then put in to the `Trigger()`, by `getTopSearch()`
 
 ## Thanks
 
