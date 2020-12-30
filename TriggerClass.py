@@ -57,10 +57,10 @@ class TriggerHandler(Thread):
                     information = ticker.info
                     price = None
                     if information['ask'] == 0:
-                        price = information['previousClose']
+                        price = float(information['previousClose'])
                     else:
-                        price = information['ask']
-                    if i.relation(price, i.value):
+                        price = float(information['ask'])
+                    if i.relation(price, float(i.value)):
                         Notification(i, ticker['longName'])
                         if i.autoDeactivateOnTrigger:
                             i.activated = False

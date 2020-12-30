@@ -12,6 +12,17 @@ This is a windows app which will give you notifications when you set up triggers
 
 Note: Please note that this uses the Linter as flake8.
 
+## Setting Up MainFile.py
+
+I'll be introducing you to setting this up via Task Scheduler. This is so far exclusively for Windows. 
+
+- So, the basic idea is to create a Task using Create Basic Task in the Task Scheduler. 
+- Give it whatever name you wish, something like `Stock Trigger`. = - This must start on it's own on Startup, so the trigger must be set `When I log on`. 
+- Then it'll just say `Start a Program`, other options are deprecated, so ignore them. 
+- Then it'll ask you to set a program/script, now go to your directory for Python (this will be in `C:/`) and select <strong>`pythonw.exe`</strong> not `python.exe` for it to run in background. 
+- In the `Add arguments` option give the whole path of `MainFile.py` and for `Start In` give the directory of `this project`.
+
+
 ## Thanks
 
 Big thanks to other repos which helped in making of this project.
