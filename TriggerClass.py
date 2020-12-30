@@ -4,6 +4,9 @@ import hashlib
 from threading import Thread
 from Notification import Notification
 import time
+import json
+import copy
+import os
 
 
 relationDict = {
@@ -24,15 +27,25 @@ relationName = {
 
 class Trigger:
     def __init__(self, symbol, value, relation, name, deactivateOnTrigger=True):
-        self.triggerbasis = 'Last Traded Price'
+        # self.triggerbasis = 'Last Traded Price'
         self.symbol = symbol
         self.relation = relationDict[relation]  # Function
+        self.relationVar = relation
         self.relationName = relationName[relation]
         self.value = value  # Set by user
         self.name = name
         self.activated = True
         self.autoDeactivateOnTrigger = deactivateOnTrigger
-        self.id = hashlib.sha1(self.name.encode())
+        self.id = hashlib.sha1(self.name.encode()).hexdigest()
+
+    def jsondump(self) -> dict:
+        copyself = copy.deepcopy(self)
+        dumpdict = copyself.__dict__
+        popvars = ['relation', 'relationName', 'activated', 'id']
+        for e in popvars:
+            dumpdict.pop(e)
+
+        return dumpdict
 
     def __str__(self):
         return f'{self.symbol}, {self.relationName}, {self.value}, {self.name}, {self.activated}, {self.autoDeactivateOnTrigger}'
@@ -75,7 +88,7 @@ class TriggerHandler(Thread):
             print("Trigger added")
 
     def deleteTrigger(self, name: str) -> None:
-        hashedName = hashlib.sha1(name.encode())
+        hashedName = hashlib.sha1(name.encode()).hexdigest()
         if hashedName in self.triggers:
             self.triggers.pop(hashedName)
             print("Trigger deleted")
@@ -89,3 +102,33 @@ class TriggerHandler(Thread):
                                 columns=['Symbol', 'Relation Name', 'Cutoff Price', 'Name', 'Activated', 'Deactivate Status'])
             df = pd.concat([df, temp], ignore_index=True)
         return df
+
+    def toJsonFile(self, fileName='dataFile.json'):
+        if os.path.exists(fileName):
+            os.remove(fileName)
+        with open(fileName, 'w+') as fo:
+            json.dump({'triggers': [i.jsondump() for i in self.triggers.values()], 'sleepTime': self.sleepTime}, fo, indent=4)
+
+    @classmethod
+    def fromJson(cls, fileName='dataFile.json'):
+        if not os.path.exists(fileName):
+            print("File Doesn't exist")
+            return cls()
+
+        with open(fileName) as fi:
+            data = json.loads(fi.read())
+
+        triggers = []
+        for i in data['triggers']:
+            trigger = Trigger(i['symbol'], i['value'], i['relationVar'], i['name'], i['autoDeactivateOnTrigger'])
+            triggers.append(trigger)
+        handler = cls(triggers, data['sleepTime'])
+
+        return handler
+
+    def __str__(self):
+        returnString = "Triggers: \n"
+        for i in self.triggers.values():
+            returnString += "\t" + i.__str__() + '\n'
+        returnString += "sleepTime: " + str(self.sleepTime) + "\n"
+        return returnString

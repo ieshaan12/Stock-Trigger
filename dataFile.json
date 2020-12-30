@@ -1,0 +1,54 @@
+{
+    "triggers": [
+        {
+            "symbol": "SBIN.NS",
+            "relationVar": "LE",
+            "value": 250,
+            "name": "Buy SBI",
+            "autoDeactivateOnTrigger": false
+        },
+        {
+            "symbol": "AXISBANK.BO",
+            "relationVar": "GE",
+            "value": 700,
+            "name": "Sell AXISBANK",
+            "autoDeactivateOnTrigger": false
+        },
+        {
+            "symbol": "RELIANCE.NS",
+            "relationVar": "GT",
+            "value": 2200,
+            "name": "Sell RIL",
+            "autoDeactivateOnTrigger": false
+        },
+        {
+            "symbol": "AJANTPHARM.NS",
+            "relationVar": "LE",
+            "value": 1600,
+            "name": "Buy AP",
+            "autoDeactivateOnTrigger": false
+        },
+        {
+            "symbol": "ITC.NS",
+            "relationVar": "LE",
+            "value": 200,
+            "name": "Buy ITC ASAP",
+            "autoDeactivateOnTrigger": false
+        },
+        {
+            "symbol": "BURGERKING.NS",
+            "relationVar": "LE",
+            "value": 120,
+            "name": "Buy BurgerKing",
+            "autoDeactivateOnTrigger": false
+        },
+        {
+            "symbol": "BHARTIARTL.NS",
+            "relationVar": "LE",
+            "value": 450,
+            "name": "Buy Airtel",
+            "autoDeactivateOnTrigger": false
+        }
+    ],
+    "sleepTime": 5
+}
