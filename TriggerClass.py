@@ -11,7 +11,6 @@ import sys
 import logging
 logger = logging.getLogger(__name__)
 
-
 relationDict = {
     "LT": float.__lt__,
     "LE": float.__le__,
