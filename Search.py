@@ -1,6 +1,8 @@
 import requests
 import lxml.html as lh
 import pandas as pd
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Search:
@@ -10,6 +12,7 @@ class Search:
         self._name = name
         self.results = None
         self.resultsDataFrame = None
+        logging.info(f"Logger initialized with name: {name}")
 
     def topResults(self) -> None:
         page = requests.get(Search.searchstring.format(self._name))
@@ -18,7 +21,7 @@ class Search:
         tableRowElements = doc.xpath('//tr')
         col = []
         i = 0
-
+        # * You will get 25 top search results
         for t in tableRowElements[0]:
             i += 1
             name = t.text_content()
@@ -41,7 +44,7 @@ class Search:
                     try:
                         data = float(data)
                     except Exception as _:
-                        pass
+                        logger.debug("Not integer data, IGNORE")
                 # Append the data to the empty list of the i'th column
                 col[i][1].append(data)
                 # Increment i for the next column
@@ -51,10 +54,12 @@ class Search:
         df = pd.DataFrame(stockDict)
         self.resultsDataFrame = df
         self.results = list(df['Symbol'])
+        logger.debug("results and resultsDataFrame populated")
 
     def getTopSearch(self) -> str:
         if self.results:
             return self.results[0]
         else:
             print("Run topResults() first, otherwise null string will be returned")
+            logger.debug("No self.results, therefore empty string returned")
         return ""
