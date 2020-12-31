@@ -1,5 +1,8 @@
-from win10toast import ToastNotifier
-import os,platform
+import platform
+if platform.system() == 'Windows':
+    from win10toast import ToastNotifier
+elif platform.system() == 'Linux':
+    import os
 
 
 class Notification:
