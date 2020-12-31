@@ -7,6 +7,9 @@ import time
 import json
 import copy
 import os
+import sys
+import logging
+logger = logging.getLogger(__name__)
 
 relationDict = {
     "LT": float.__lt__,
@@ -36,11 +39,12 @@ class Trigger:
         self.activated = True
         self.autoDeactivateOnTrigger = deactivateOnTrigger
         self.id = hashlib.sha1(self.name.encode()).hexdigest()
+        logger.info("Trigger with name: {} created for stock: {}".format(name, symbol))
 
     def jsondump(self) -> dict:
         copyself = copy.deepcopy(self)
         dumpdict = copyself.__dict__
-        popvars = ['relation', 'relationName', 'activated', 'id']
+        popvars = ['relation', 'relationName', 'activated', 'id']  # * Consider removing id or not
         for e in popvars:
             dumpdict.pop(e)
 
@@ -57,11 +61,16 @@ class TriggerHandler(Thread):
         self.triggers = dict()
         for i in triggers:
             self.triggers[i.id] = i
+        logger.info("Creating a class of TriggerHandler")
 
     def run(self):
+        logger.info("Thread of TriggerHandler initialized")
+        count = 0
         try:
             while True:
+                count += 1
                 time.sleep(self.sleepTime)
+                logger.debug(f"Checking, Run: {count}")
                 for i in self.triggers.values():
                     if not i.activated:
                         continue
@@ -77,22 +86,25 @@ class TriggerHandler(Thread):
                         if i.autoDeactivateOnTrigger:
                             i.activated = False
         except Exception as e:
-            print(e)
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            logger.error("ERROR! Type: {}, File: {}, Line: {}".format(exc_type, fname, exc_tb.tb_lineno))
 
     def addTrigger(self, newTrigger: Trigger) -> None:
         if newTrigger.id in self.triggers:
             print("Name already exists, can't add this trigger with this name")
+            logger.debug("Trigger with id: {} already exists [name: {}]".format(newTrigger.id, newTrigger.name))
         else:
             self.triggers[newTrigger.id] = newTrigger
-            print("Trigger added")
+            logger.debug("Trigger added with name: {} and id: {}".format(newTrigger.name, newTrigger.id))
 
     def deleteTrigger(self, name: str) -> None:
         hashedName = hashlib.sha1(name.encode()).hexdigest()
         if hashedName in self.triggers:
             self.triggers.pop(hashedName)
-            print("Trigger deleted")
+            logger.debug("Trigger deleted, Name: {}".format(name))
         else:
-            print("Trigger not present, nothing to delete")
+            logger.debug("Trigger with name:{} not present, nothing to delete".format(name))
 
     def listAllTriggers(self):
         df = pd.DataFrame(columns=['Symbol', 'Relation Name', 'Cutoff Price', 'Name', 'Activated', 'Deactivate Status'])
@@ -100,18 +112,22 @@ class TriggerHandler(Thread):
             temp = pd.DataFrame([[i.symbol, i.relationName, i.value, i.name, i.activated, i.autoDeactivateOnTrigger]],
                                 columns=['Symbol', 'Relation Name', 'Cutoff Price', 'Name', 'Activated', 'Deactivate Status'])
             df = pd.concat([df, temp], ignore_index=True)
+        logger.info("All triggers returned as DataFrame")
         return df
 
     def toJsonFile(self, fileName='dataFile.json'):
         if os.path.exists(fileName):
             os.remove(fileName)
+            logger.debug(f"Removing json file: {fileName}")
         with open(fileName, 'w+') as fo:
             json.dump({'triggers': [i.jsondump() for i in self.triggers.values()], 'sleepTime': self.sleepTime}, fo, indent=4)
+        logger.debug(f"New file created: {fileName}")
 
     @classmethod
     def fromJson(cls, fileName='dataFile.json'):
+        logger.debug("Class method fromJson called")
         if not os.path.exists(fileName):
-            print("File Doesn't exist")
+            logger.debug(f"File:{fileName} Doesn't exist")
             return cls()
 
         with open(fileName) as fi:
@@ -122,7 +138,7 @@ class TriggerHandler(Thread):
             trigger = Trigger(i['symbol'], i['value'], i['relationVar'], i['name'], i['autoDeactivateOnTrigger'])
             triggers.append(trigger)
         handler = cls(triggers, data['sleepTime'])
-
+        logger.info(f"New class of TriggerHandler returned from jsonfile: {fileName}")
         return handler
 
     def __str__(self):
