@@ -1,6 +1,17 @@
 from TriggerClass import TriggerHandler
+import logging
+from datetime import datetime
 
 if __name__ == "__main__":
+    logFile = 'logs/stocktrigger/{}.log'.format(
+        datetime.now().strftime("%d-%m-%y"))
+    logForm = '%(asctime)s.%(msecs)03d %(levelname)s %(module)s -\
+%(funcName)s: %(message)s'
+    logging.basicConfig(filename=logFile,
+                        filemode='a',
+                        format=logForm,
+                        datefmt='%Y-%m-%d %H:%M:%S',
+                        level=logging.DEBUG)
     # trigger1 = Trigger("SBIN.NS", 250, "LE", "Buy SBI", False)
     # trigger2 = Trigger("AXISBANK.BO", 700, "GE", "Sell AXISBANK", False)
     # trigger3 = Trigger("RELIANCE.NS", 2200, "GT", "Sell RIL", False)
