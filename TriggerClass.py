@@ -2,12 +2,12 @@ import yfinance as yf
 import pandas as pd
 import hashlib
 from threading import Thread
-from Notification import Notification
+from Notification import Notification,Notification_linux
 import time
 import json
 import copy
 import os
-
+import platform
 
 relationDict = {
     "LT": float.__lt__,
@@ -74,7 +74,10 @@ class TriggerHandler(Thread):
                     else:
                         price = float(information['ask'])
                     if i.relation(price, float(i.value)):
-                        Notification(i, ticker['longName'])
+                        if platform.system() == 'Windows':
+                            Notification(i, information['longName'])
+                        elif platform.system() == 'Linux':
+                            Notification_linux(i,information['longName'])
                         if i.autoDeactivateOnTrigger:
                             i.activated = False
         except Exception as e:
