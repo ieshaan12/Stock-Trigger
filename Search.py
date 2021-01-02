@@ -14,11 +14,14 @@ class Search:
         self.resultsDataFrame = None
         logging.info(f"Logger initialized with name: {name}")
 
-    def topResults(self) -> None:
+    def topResults(self) -> int:
         page = requests.get(Search.searchstring.format(self._name))
         doc = lh.fromstring(page.content)
         # Getting results
         tableRowElements = doc.xpath('//tr')
+        if len(tableRowElements) == 0:
+            logging.warning(f"No elements returned for {self._name}")
+            return -1
         col = []
         i = 0
         # * You will get 25 top search results
@@ -43,7 +46,7 @@ class Search:
                     # Convert any numerical value to integers
                     try:
                         data = float(data)
-                    except Exception as _:
+                    except:  # noqa: E722
                         logger.debug("Not integer data, IGNORE")
                 # Append the data to the empty list of the i'th column
                 col[i][1].append(data)
@@ -53,8 +56,9 @@ class Search:
         stockDict = {title: column for (title, column) in col}
         df = pd.DataFrame(stockDict)
         self.resultsDataFrame = df
-        self.results = list(df['Symbol'])
+        self.results = list(df['Name']+' - '+df['Symbol'])
         logger.debug("results and resultsDataFrame populated")
+        return 0
 
     def getTopSearch(self) -> str:
         if self.results:
@@ -63,3 +67,6 @@ class Search:
             print("Run topResults() first, otherwise null string will be returned")
             logger.debug("No self.results, therefore empty string returned")
         return ""
+
+    def setName(self, name=""):
+        self._name = name

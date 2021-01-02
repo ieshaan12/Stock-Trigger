@@ -4,13 +4,44 @@ This is a windows app which will give you notifications when you set up triggers
 
 ## Useful Contributions
 
-- Making a GUI which lets you add, view and delete triggers using PyQt5 (preferably, but if you have something, else sure, why not) [Priority - High]
-    - Since this program uses threads, you'll probably have to kill the original running process and re-run with new triggers, if triggers are added. If trigger is removed, then no problem either
+- Making a GUI which lets you add, view and delete triggers using PyQt5 (preferably, but if you have something, else sure, why not) [Priority - High] [<strong>COMPLETED - 3 Jan 2021</strong>]
+    - Since this program uses threads, you'll probably have to kill the original running process and re-run with new triggers, if triggers are added. If trigger is removed, then no problem either 
 - Making this cross-platform [Priortiy - Medium]
+    - Testing GUI across, Linux, and MacOS
 - Comment the code, I'd prefer to do this later myself, but any volunteers are welcome [Priority - Low]
     - If you take up doing this, follow Numpy's Python Documentaion Format. Available [here](https://numpydoc.readthedocs.io/en/latest/format.html).
+- Logging for GUI [Priority - Medium]
 
-Note: Please note that this uses the Linter as flake8.
+Note: 
+1. Please note that this uses the Linter as flake8.
+2. Using `noqa: E722` wherever bare exceptions are present.
+
+## Addition of Search and Trigger GUI!
+
+I couldn't be more excited to do this. This is an amazing thing which I was able to implement in a decent amount of time, I suppose. 
+There is a lack of style sheets, so please excuse me for that, but they carry out the rest of the functions quite the same way.
+
+### Search GUI
+
+- You can search for any of the stocks by typing it's name followed by a click on the `Search!` button!
+
+![Search GUI](/images/SearchGUI.PNG)
+
+- After this go to either `COPY SELECTED TO CLIPBOARD` to copy the item you've chosen in the dropdown or you could see a more descriptive list on pressing the `SEARCH DATA TABLE BUTTON`
+
+![Search Data Table](/images/SearchData.PNG)
+
+### Trigger GUI
+
+- You can add any trigger you want by adding the stock symbol after copying it to clipboard using the Search GUI. Use any of the relations add the value of the trigger you're setting and add any name you want. You could also set up a deactivate on trigger after it has triggered. And then press the `Add Trigger` button.
+
+![Trigger GUI](/images/TriggerGUI.PNG)
+
+- For deleting a trigger, just type the name of the trigger you wish to delete and click the `Delete Trigger` button
+
+![Trigger Data Table](/images/TriggerData.PNG)
+
+- On Clicking the `List All Triggers` button you'll get a table like so that will show you all the triggers you've created so far.
 
 ## Setting Up MainFile.py
 
@@ -33,3 +64,7 @@ Big thanks to other repos which helped in making of this project.
 - [yfinance](https://github.com/ranaroussi/yfinance)
 - [win10toast](https://github.com/jithurjacob/Windows-10-Toast-Notifications)
 - [pandas](https://github.com/pandas-dev/pandas)
+
+## Reporting errors
+
+Hey, if you've find any errors so far. Please let me know by reporting an issue with an image if possible or just attach your log file or mail me at ieshaan1999@gmail.com.
