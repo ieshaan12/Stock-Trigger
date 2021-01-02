@@ -1,8 +1,21 @@
 from TriggerClass import TriggerHandler
 import logging
 from datetime import datetime
+import os
 
 if __name__ == "__main__":
+    if os.path.isdir('logs'):
+        if os.path.isdir('stocktrigger'):
+            pass
+        else:
+            os.mkdir('logs/stocktrigger')
+    else:
+        os.mkdir('logs')
+        if os.path.isdir('stocktrigger'):
+            pass
+        else:
+            os.mkdir('logs/stocktrigger')
+
     logFile = 'logs/stocktrigger/{}.log'.format(
         datetime.now().strftime("%d-%m-%y"))
     logForm = '%(asctime)s.%(msecs)03d %(levelname)s %(module)s -\
@@ -12,6 +25,7 @@ if __name__ == "__main__":
                         format=logForm,
                         datefmt='%Y-%m-%d %H:%M:%S',
                         level=logging.DEBUG)
+    logging.debug("----- PROGRAM[MainFile.py] RUN START FROM HERE -----")
     # trigger1 = Trigger("SBIN.NS", 250, "LE", "Buy SBI", False)
     # trigger2 = Trigger("AXISBANK.BO", 700, "GE", "Sell AXISBANK", False)
     # trigger3 = Trigger("RELIANCE.NS", 2200, "GT", "Sell RIL", False)

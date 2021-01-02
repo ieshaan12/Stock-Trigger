@@ -56,6 +56,7 @@ class Trigger:
 
 class TriggerHandler(Thread):
     def __init__(self, triggers=[], sleepTime=1):
+        # ? Do sleepTime as an argparse or something
         Thread.__init__(self)
         self.sleepTime = sleepTime
         self.triggers = dict()
@@ -75,7 +76,9 @@ class TriggerHandler(Thread):
                     if not i.activated:
                         continue
                     ticker = yf.Ticker(i.symbol)
+                    logging.debug(f"Obtained Ticker, {i.symbol}")
                     information = ticker.info
+                    logging.debug(f"Checking ticker.info, {information['previousClose']} for stock {information['longName']}")
                     price = None
                     if information['ask'] == 0:
                         price = float(information['previousClose'])
@@ -85,26 +88,30 @@ class TriggerHandler(Thread):
                         Notification(i, information['longName'])
                         if i.autoDeactivateOnTrigger:
                             i.activated = False
-        except Exception as e:
+        except:  # noqa: E722
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             logger.error("ERROR! Type: {}, File: {}, Line: {}".format(exc_type, fname, exc_tb.tb_lineno))
 
-    def addTrigger(self, newTrigger: Trigger) -> None:
+    def addTrigger(self, newTrigger: Trigger) -> int:
         if newTrigger.id in self.triggers:
             print("Name already exists, can't add this trigger with this name")
             logger.debug("Trigger with id: {} already exists [name: {}]".format(newTrigger.id, newTrigger.name))
+            return -1
         else:
             self.triggers[newTrigger.id] = newTrigger
             logger.debug("Trigger added with name: {} and id: {}".format(newTrigger.name, newTrigger.id))
+            return 0
 
-    def deleteTrigger(self, name: str) -> None:
+    def deleteTrigger(self, name: str) -> int:
         hashedName = hashlib.sha1(name.encode()).hexdigest()
         if hashedName in self.triggers:
             self.triggers.pop(hashedName)
             logger.debug("Trigger deleted, Name: {}".format(name))
+            return 0
         else:
             logger.debug("Trigger with name:{} not present, nothing to delete".format(name))
+            return 1
 
     def listAllTriggers(self):
         df = pd.DataFrame(columns=['Symbol', 'Relation Name', 'Cutoff Price', 'Name', 'Activated', 'Deactivate Status'])

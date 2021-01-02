@@ -48,6 +48,13 @@
             "value": 450,
             "name": "Buy Airtel",
             "autoDeactivateOnTrigger": false
+        },
+        {
+            "symbol": "AAPL",
+            "relationVar": "LE",
+            "value": 200.0,
+            "name": "Check on Apple",
+            "autoDeactivateOnTrigger": true
         }
     ],
     "sleepTime": 5
