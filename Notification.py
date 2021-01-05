@@ -13,7 +13,6 @@ class Notification:
             self.toast = ToastNotifier()
             self.toast.show_toast(trigger.name, f"{CompanyName}'s has been triggered, Price {trigger.relationName} {trigger.value}")
         elif platform.system() == 'Linux':
-            title = "Stock Trigger"
             message = f"{CompanyName}'s has been triggered, Price {trigger.relationName} {trigger.value}"
-            os.system('notify-send "{}" "{}"'.format(title,message))
+            os.system('notify-send "{}" "{}"'.format(trigger.name, message))
         logger.info(f"Trigger initialized with name: {trigger.name} for company: {CompanyName}")

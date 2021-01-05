@@ -13,6 +13,9 @@ from TriggerClass import Trigger, TriggerHandler
 from HelperWindows import DataFrameView, StandardErrorDialog
 import os
 import sys
+from datetime import datetime
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Ui_TriggerWindow(object):
@@ -176,10 +179,12 @@ class Ui_TriggerWindow(object):
         self.DeleteButton.clicked.connect(self.deleteTrigger)
         self.ListButton.clicked.connect(self.listTriggers)
 
-        self.TrigHand = TriggerHandler.fromJson()
+        self.TrigHand = TriggerHandler.fromJson()   # * For now the default file is set to dataFile.json
+        logger.info("TriggerGUI obtained the data from jsonFile")
 
         self.retranslateUi(TriggerWindow)
         QtCore.QMetaObject.connectSlotsByName(TriggerWindow)
+        logger.debug("TriggerGUI window initiliazed!")
 
     def retranslateUi(self, TriggerWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -224,26 +229,31 @@ class Ui_TriggerWindow(object):
             self.dialog.exec()
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print("ERROR! Type: {}, File: {}, Line: {}".format(exc_type, fname, exc_tb.tb_lineno))
+            logger.error("ERROR! Type: {}, File: {}, Line: {}".format(exc_type, fname, exc_tb.tb_lineno))
             return
 
         if len(name) == 0 or value <= 0 or len(symbol) == 0:
             self.dialog = StandardErrorDialog(parent=None, text=f"Something is empty or wrong, {name} {value} {symbol}")
             self.dialog.ui.pushButton.clicked.connect(self.dialog.close)
             self.dialog.exec()
+            logger.error("Either name is empty, value is less than 0 or symbol name is empty")
             return
 
         trigger = Trigger(symbol, value, relation, name, deactivate)
-
+        logger.debug(f"Trigger object created with name={name}")
         retVal = self.TrigHand.addTrigger(trigger)
 
         if retVal == -1:
             self.dialog = StandardErrorDialog(parent=None, text=f"Name already exists, can't add this trigger with this name: {name}")
             self.dialog.ui.pushButton.clicked.connect(self.dialog.close)
             self.dialog.exec()
+            logger.error(f"Name already exists, can't add this trigger with this name: {name}")
             return
 
+        logger.info(f"Trigger({name}) added successfully")
+
         self.TrigHand.toJsonFile()
+        logger.info(f"Written back succesfully with new trigger name: {name}")
 
     def deleteTrigger(self):
         name = self.NameText.text()
@@ -252,6 +262,7 @@ class Ui_TriggerWindow(object):
             self.dialog = StandardErrorDialog(parent=None, text="Name is empty, please add a valid name!")
             self.dialog.ui.pushButton.clicked.connect(self.dialog.close)
             self.dialog.exec()
+            logger.error("Name is empty, please add a valid name!")
             return
 
         retVal = self.TrigHand.deleteTrigger(name)
@@ -260,18 +271,43 @@ class Ui_TriggerWindow(object):
             self.dialog = StandardErrorDialog(parent=None, text=f"No trigger exists with this name: {name}")
             self.dialog.ui.pushButton.clicked.connect(self.dialog.close)
             self.dialog.exec()
-            print("No trigger exists with this name")
+            logger.error("No trigger exists with this name")
 
         self.TrigHand.toJsonFile()
+        logger.info(f"Written back succesfully with trigger removed: {name}")
 
     def listTriggers(self):
         df = self.TrigHand.listAllTriggers()
+        logger.info("Listing all triggers")
         self.dataWindow = DataFrameView()
         self.dataWindow.setData(df)
         self.dataWindow.show()
 
 
 if __name__ == "__main__":
+    if os.path.isdir('logs'):
+        if os.path.isdir('logs/triggergui'):
+            pass
+        else:
+            os.mkdir('logs/triggergui')
+    else:
+        os.mkdir('logs')
+        if os.path.isdir('triggergui'):
+            pass
+        else:
+            os.mkdir('logs/triggergui')
+
+    logFile = 'logs/triggergui/{}.log'.format(
+        datetime.now().strftime("%d-%m-%y"))
+    logForm = '%(asctime)s.%(msecs)03d %(levelname)s %(module)s -\
+%(funcName)s: %(message)s'
+    logging.basicConfig(filename=logFile,
+                        filemode='a',
+                        format=logForm,
+                        datefmt='%Y-%m-%d %H:%M:%S',
+                        level=logging.DEBUG)
+    logging.debug("----- PROGRAM[TriggerGUI.py] RUN START FROM HERE -----")
+
     app = QtWidgets.QApplication(sys.argv)
     TriggerWindow = QtWidgets.QMainWindow()
     ui = Ui_TriggerWindow()

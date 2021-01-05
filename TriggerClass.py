@@ -95,7 +95,6 @@ class TriggerHandler(Thread):
 
     def addTrigger(self, newTrigger: Trigger) -> int:
         if newTrigger.id in self.triggers:
-            print("Name already exists, can't add this trigger with this name")
             logger.debug("Trigger with id: {} already exists [name: {}]".format(newTrigger.id, newTrigger.name))
             return -1
         else:

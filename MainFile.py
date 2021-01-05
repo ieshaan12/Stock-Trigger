@@ -5,13 +5,13 @@ import os
 
 if __name__ == "__main__":
     if os.path.isdir('logs'):
-        if os.path.isdir('stocktrigger'):
+        if os.path.isdir('logs/stocktrigger'):
             pass
         else:
             os.mkdir('logs/stocktrigger')
     else:
         os.mkdir('logs')
-        if os.path.isdir('stocktrigger'):
+        if os.path.isdir('logs/stocktrigger'):
             pass
         else:
             os.mkdir('logs/stocktrigger')

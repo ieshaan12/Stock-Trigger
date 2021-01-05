@@ -5,13 +5,13 @@ import os
 
 if __name__ == "__main__":
     if os.path.isdir('logs'):
-        if os.path.isdir('search'):
+        if os.path.isdir('logs/search'):
             pass
         else:
             os.mkdir('logs/search')
     else:
         os.mkdir('logs')
-        if os.path.isdir('search'):
+        if os.path.isdir('logs/search'):
             pass
         else:
             os.mkdir('logs/search')

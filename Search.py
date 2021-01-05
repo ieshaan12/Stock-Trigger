@@ -64,7 +64,7 @@ class Search:
         if self.results:
             return self.results[0]
         else:
-            print("Run topResults() first, otherwise null string will be returned")
+            # * ("Run topResults() first, otherwise null string will be returned")
             logger.debug("No self.results, therefore empty string returned")
         return ""
 

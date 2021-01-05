@@ -12,6 +12,10 @@ from Search import Search
 import sys
 import pyperclip
 from HelperWindows import DataFrameView, StandardErrorDialog
+import os
+from datetime import datetime
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Ui_MainWindow(object):
@@ -107,8 +111,10 @@ class Ui_MainWindow(object):
 
         self.retValSearch = -2
         self.searchObj = Search()
+        logger.info("Search object added")
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        logger.info("SearchGUI window initialized!")
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -126,37 +132,67 @@ class Ui_MainWindow(object):
             self.dialog = StandardErrorDialog(parent=None, text=f"Nothing returned for this name: {data}!")
             self.dialog.ui.pushButton.clicked.connect(self.dialog.close)
             self.dialog.exec()
+            logger.error(f"Nothing returned for this name: {data}!")
             return
         self.ResultsBox.clear()
         self.ResultsBox.addItems(self.searchObj.results)
+        logger.info(f"Items{len(self.searchObj.results)} added from search results!")
 
     def copyToClipboard(self):
         if self.retValSearch == -2 or self.retValSearch == -1:
             self.dialog = StandardErrorDialog(parent=None, text="Nothing to copy, please enter valid company name and click on 'Search!' Button")
             self.dialog.ui.pushButton.clicked.connect(self.dialog.close)
             self.dialog.exec()
+            logger.error("Nothing to copy!")
             return
 
         data = (self.ResultsBox.currentText().split('-')[1]).strip()
         pyperclip.copy(data)
+        logger.info(f"This stock:{data} has been copied successfully!")
 
     def createDataFrameWindow(self):
         if self.retValSearch == -1:
             self.dialog = StandardErrorDialog(parent=None, text="No results available for this stock name!")
             self.dialog.ui.pushButton.clicked.connect(self.dialog.close)
             self.dialog.exec()
+            logger.error("No results available for this stock name!")
             return
         if self.retValSearch == -2:
             self.dialog = StandardErrorDialog(parent=None, text="You haven't searched for anything!")
             self.dialog.ui.pushButton.clicked.connect(self.dialog.close)
             self.dialog.exec()
+            logger.error("No search has been done!")
             return
         self.dataWindow = DataFrameView()
         self.dataWindow.setData(self.searchObj.resultsDataFrame)
         self.dataWindow.show()
+        logger.info("DataFrameView created!")
 
 
 if __name__ == "__main__":
+    if os.path.isdir('logs'):
+        if os.path.isdir('logs/searchgui'):
+            pass
+        else:
+            os.mkdir('logs/searchgui')
+    else:
+        os.mkdir('logs')
+        if os.path.isdir('logs/searchgui'):
+            pass
+        else:
+            os.mkdir('logs/searchgui')
+
+    logFile = 'logs/searchgui/{}.log'.format(
+        datetime.now().strftime("%d-%m-%y"))
+    logForm = '%(asctime)s.%(msecs)03d %(levelname)s %(module)s -\
+%(funcName)s: %(message)s'
+    logging.basicConfig(filename=logFile,
+                        filemode='a',
+                        format=logForm,
+                        datefmt='%Y-%m-%d %H:%M:%S',
+                        level=logging.DEBUG)
+    logging.debug("----- PROGRAM[SearchGUI.py] RUN START FROM HERE -----")
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
