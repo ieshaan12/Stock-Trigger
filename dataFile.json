@@ -55,6 +55,13 @@
             "value": 200.0,
             "name": "Check on Apple",
             "autoDeactivateOnTrigger": true
+        },
+        {
+            "symbol": "RELIANCE.NS",
+            "relationVar": "LE",
+            "value": 1900.0,
+            "name": "Buy More Reliance",
+            "autoDeactivateOnTrigger": true
         }
     ],
     "sleepTime": 5
